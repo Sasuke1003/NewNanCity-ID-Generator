@@ -1,0 +1,768 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft 牛腩世界身份证生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --mc-green: #5b7c3a;
+            --mc-dark-green: #3d5a1e;
+            --mc-brown: #8b7355;
+            --mc-dark-brown: #6f4e37;
+            --mc-light: #f0f0f0;
+            --mc-dark: #2d2d2d;
+            --mc-gray: #5a5a5a;
+            --mc-gold: #FFD700;
+            --mc-dark-gold: #B8860B;
+            --mc-blue: #4169E1;
+            --mc-dark-blue: #1E3A8A;
+            --mc-red: #FF5555;
+        }
+        
+        body {
+            background-color: #1a1a1a;
+            color: var(--mc-light);
+            background-image: linear-gradient(rgba(26, 26, 26, 0.9), rgba(26, 26, 26, 0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%23333" width="100" height="100"/><rect fill="%23222" width="50" height="50" x="0" y="0"/><rect fill="%23222" width="50" height="50" x="50" y="50"/></svg>');
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid var(--mc-gold);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--mc-gold);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 var(--mc-dark-gold);
+        }
+        
+        .instructions-panel {
+            background-color: rgba(45, 45, 45, 0.9);
+            border: 3px solid var(--mc-gold);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+        
+        .generated-command {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .command-output {
+            flex-grow: 1;
+            background-color: var(--mc-dark);
+            border: 2px solid var(--mc-gray);
+            border-radius: 5px 0 0 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            overflow-x: auto;
+            color: #4CAF50;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        
+        .copy-btn {
+            background-color: var(--mc-gold);
+            color: #333;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            padding: 0 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: var(--mc-dark-gold);
+        }
+        
+        .copy-btn.copied {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .command-generators {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .command-generators {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .generator-card {
+            background-color: rgba(45, 45, 45, 0.9);
+            border: 3px solid var(--mc-gold);
+            border-radius: 8px;
+            padding: 25px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .generator-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--mc-dark-gold);
+        }
+        
+        .card-title {
+            color: var(--mc-gold);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--mc-dark-gold);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ddd;
+            font-size: 1.1rem;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--mc-red);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--mc-dark);
+            border: 2px solid var(--mc-gray);
+            border-radius: 6px;
+            color: white;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--mc-gold);
+        }
+        
+        input.error {
+            border-color: var(--mc-red);
+        }
+        
+        .error-message {
+            color: var(--mc-red);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .generate-btn {
+            background-color: var(--mc-gold);
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 100%;
+            transition: background-color 0.3s;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .generate-btn:hover {
+            background-color: var(--mc-dark-gold);
+        }
+        
+        .instructions {
+            background-color: rgba(45, 45, 45, 0.9);
+            border: 2px solid var(--mc-gold);
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            color: var(--mc-gold);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-size: 1.05rem;
+        }
+        
+        .instructions p {
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        
+        .mc-icon {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--mc-gray);
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .book-preview {
+            background-color: rgba(30, 30, 30, 0.9);
+            border: 3px solid var(--mc-gold);
+            border-radius: 8px;
+            padding: 25px;
+            height: 100%;
+        }
+        
+        .book-preview h3 {
+            color: var(--mc-gold);
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .book-content {
+            background-color: #f5e9d4;
+            color: #3a2c1a;
+            border: 2px solid #8b7355;
+            border-radius: 5px;
+            padding: 25px;
+            height: 450px;
+            font-size: 1.15rem;
+            line-height: 1.6;
+            white-space: pre-line;
+            font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif;
+            box-shadow: inset 0 0 10px rgba(139, 115, 85, 0.3);
+            overflow-y: auto;
+        }
+        
+        .book-title {
+            color: var(--mc-gold);
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        
+        .book-title .yellow {
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .book-title .white {
+            color: white;
+        }
+        
+        .book-content .center {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            display: block;
+            margin: 10px 0;
+            color: #8B0000;
+        }
+        
+        .book-content .player-id {
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .book-content .date {
+            color: #cc3300;
+            font-weight: bold;
+        }
+        
+        .book-content .town {
+            color: #009933;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .book-content .count {
+            color: #9933cc;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .example-btn {
+            background-color: var(--mc-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .example-btn:hover {
+            background-color: var(--mc-dark-blue);
+        }
+        
+        .java-version {
+            color: var(--mc-blue);
+            font-weight: bold;
+        }
+        
+        .executor-input {
+            margin-bottom: 10px;
+        }
+        
+        .executor-input label {
+            font-size: 1rem;
+        }
+        
+        .executor-input input {
+            padding: 10px;
+            font-size: 1rem;
+        }
+        
+        .author-note {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-id-card mc-icon"></i> Minecraft 牛腩世界身份证生成器</h1>
+        </header>
+        
+        <main>
+            <section class="instructions-panel">
+                <h2>生成的身份证指令</h2>
+                <div class="generated-command">
+                    <div class="command-output" id="commandOutput">请填写下方信息生成身份证指令</div>
+                    <button class="copy-btn" id="copyBtn">复制</button>
+                </div>
+            </section>
+            
+            <div class="command-generators">
+                <!-- 身份证生成器 -->
+                <div class="generator-card">
+                    <h3 class="card-title"><i class="fas fa-id-card"></i> 身份证信息填写</h3>
+                    
+                    <div class="input-group executor-input">
+                        <label for="executor" class="required">指令执行者</label>
+                        <input type="text" id="executor" placeholder="执行/give指令的玩家" value="@p">
+                        <button class="example-btn" onclick="document.getElementById('executor').value = '@p'">示例: @p (当前玩家)</button>
+                        <div class="author-note">可以是玩家ID、@p、@a、@r等选择器</div>
+                    </div>
+                    
+                    <div class="input-group executor-input">
+                        <label for="author" class="required">书本作者</label>
+                        <input type="text" id="author" placeholder="书本作者名字" value="MSA_Sasuke">
+                        <button class="example-btn" onclick="document.getElementById('author').value = 'MSA_Sasuke'">示例: MSA_Sasuke</button>
+                        <div class="author-note">必须为英文字母、数字、下划线组成，不能为空</div>
+                        <div class="error-message" id="authorError">作者名只能包含英文字母、数字和下划线，且不能为空</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="playerId" class="required">身份证持有者ID</label>
+                        <input type="text" id="playerId" placeholder="身份证上的玩家ID">
+                        <button class="example-btn" onclick="document.getElementById('playerId').value = 'MSA_Sasuke'">示例: MSA_Sasuke</button>
+                        <div class="error-message" id="playerIdError">请输入身份证持有者ID</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="joinDate" class="required">入服日期</label>
+                        <input type="text" id="joinDate" placeholder="格式：XXXX年XX月XX日">
+                        <button class="example-btn" onclick="setTodayDate()">按下自动输入今日日期</button>
+                        <div class="error-message" id="joinDateError">日期格式不正确或早于2020年2月2日</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="town" class="required">所属城镇</label>
+                        <input type="text" id="town" placeholder="请输入城镇名称" value="牛腩镇">
+                        <button class="example-btn" onclick="document.getElementById('town').value = '天元镇'">必须为已评为1星城镇或以上的城镇</button>
+                        <div class="error-message" id="townError">请输入所属城镇</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="reissueCount" class="required">补发次数</label>
+                        <input type="number" id="reissueCount" value="1" min="1" max="99">
+                        <button class="example-btn" onclick="document.getElementById('reissueCount').value = '1'">示例: 1</button>
+                        <div class="error-message" id="reissueCountError">补发次数不能少于1</div>
+                    </div>
+                    
+                    <button class="generate-btn" id="generateIdCard">
+                        <i class="fas fa-book"></i> 生成身份证指令
+                    </button>
+                </div>
+                
+                <!-- 预览区域 -->
+                <div class="book-preview">
+                    <h3><i class="fas fa-book-open"></i> 身份证预览</h3>
+                    <div class="book-title">
+                        <span class="yellow" id="previewId">玩家ID</span><span class="white"> 的牛腩世界身份证</span>
+                        <div style="font-size: 0.9rem; color: #aaa; margin-top: 5px;">作者: <span id="previewAuthor">MSA_Sasuke</span></div>
+                    </div>
+                    <div class="book-content" id="bookPreview">
+                        (请填写左侧信息预览身份证内容)
+                    </div>
+                </div>
+            </div>
+            
+            <section class="instructions">
+                <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+                <ul>
+                    <li><strong>指令执行者</strong>：执行/give指令的玩家，默认为@p（当前玩家），可以是玩家ID或选择器</li>
+                    <li><strong>书本作者</strong>：书本的作者名字，必须为英文字母、数字、下划线组成，不能为空</li>
+                    <li><strong>身份证持有者ID</strong>：身份证上的玩家名字，必须填写</li>
+                    <li><strong>入服日期</strong>：格式为"XXXX年XX月XX日"，不能早于2020年2月2日</li>
+                    <li><strong>所属城镇</strong>：必须为已评为1星城镇或以上的城镇，默认为牛腩镇</li>
+                    <li><strong>补发次数</strong>：补发次数不能少于1，默认为1</li>
+                    <li>点击"生成身份证指令"按钮生成指令，点击"复制"按钮复制指令</li>
+                    <li>在Minecraft游戏中执行指令，即可给指定玩家生成身份证</li>
+                    <li>右侧可实时预览书本内容效果</li>
+                </ul>
+                <p><strong>注意：</strong>执行指令的玩家需要有OP权限或在开启作弊的世界中。</p>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Minecraft | NewNanCity 牛腩小镇 | 牛腩世界身份证生成器</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const commandOutput = document.getElementById('commandOutput');
+        const copyBtn = document.getElementById('copyBtn');
+        const bookPreview = document.getElementById('bookPreview');
+        const previewId = document.getElementById('previewId');
+        const previewAuthor = document.getElementById('previewAuthor');
+        
+        // 输入元素
+        const executorInput = document.getElementById('executor');
+        const authorInput = document.getElementById('author');
+        const playerIdInput = document.getElementById('playerId');
+        const joinDateInput = document.getElementById('joinDate');
+        const townInput = document.getElementById('town');
+        const reissueCountInput = document.getElementById('reissueCount');
+        
+        // 错误信息元素
+        const authorError = document.getElementById('authorError');
+        const playerIdError = document.getElementById('playerIdError');
+        const joinDateError = document.getElementById('joinDateError');
+        const townError = document.getElementById('townError');
+        const reissueCountError = document.getElementById('reissueCountError');
+        
+        // 生成按钮
+        const generateIdCardBtn = document.getElementById('generateIdCard');
+        
+        // 获取当前日期并格式化为中文格式
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+        
+        // 设置今日日期到输入框
+        function setTodayDate() {
+            joinDateInput.value = getCurrentDate();
+            updateBookPreview();
+            hideError(joinDateInput, joinDateError);
+        }
+        
+        // 验证作者名字格式（英文字母、数字、下划线）
+        function validateAuthor(authorStr) {
+            if (!authorStr || authorStr.trim() === '') return false;
+            // 只允许英文字母、数字和下划线
+            const pattern = /^[a-zA-Z0-9_]+$/;
+            return pattern.test(authorStr);
+        }
+        
+        // 验证日期格式和范围
+        function validateDate(dateStr) {
+            // 验证格式：XXXX年XX月XX日
+            const pattern = /^(\d{4})年(\d{2})月(\d{2})日$/;
+            if (!pattern.test(dateStr)) return false;
+            
+            // 提取年月日
+            const match = dateStr.match(pattern);
+            const year = parseInt(match[1]);
+            const month = parseInt(match[2]);
+            const day = parseInt(match[3]);
+            
+            // 验证日期有效性
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            
+            // 验证不能早于2020年2月2日
+            if (year < 2020) return false;
+            if (year === 2020 && month < 2) return false;
+            if (year === 2020 && month === 2 && day < 2) return false;
+            
+            return true;
+        }
+        
+        // 显示/隐藏错误信息
+        function showError(inputElement, errorElement, message) {
+            inputElement.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            return false;
+        }
+        
+        function hideError(inputElement, errorElement) {
+            inputElement.classList.remove('error');
+            errorElement.style.display = 'none';
+            return true;
+        }
+        
+        // 验证表单
+        function validateForm() {
+            let isValid = true;
+            
+            // 验证指令执行者
+            const executor = executorInput.value.trim();
+            if (!executor) {
+                isValid = showError(executorInput, playerIdError, "请输入指令执行者");
+            } else {
+                hideError(executorInput, playerIdError);
+            }
+            
+            // 验证作者名字
+            const author = authorInput.value.trim();
+            if (!author) {
+                isValid = showError(authorInput, authorError, "请输入书本作者");
+            } else if (!validateAuthor(author)) {
+                isValid = showError(authorInput, authorError, "作者名只能包含英文字母、数字和下划线");
+            } else {
+                hideError(authorInput, authorError);
+            }
+            
+            // 验证身份证持有者ID
+            const playerId = playerIdInput.value.trim();
+            if (!playerId) {
+                isValid = showError(playerIdInput, playerIdError, "请输入身份证持有者ID");
+            } else {
+                hideError(playerIdInput, playerIdError);
+            }
+            
+            // 验证入服日期
+            const joinDate = joinDateInput.value.trim();
+            if (!joinDate) {
+                isValid = showError(joinDateInput, joinDateError, "请输入入服日期");
+            } else if (!validateDate(joinDate)) {
+                isValid = showError(joinDateInput, joinDateError, "日期格式不正确或早于2020年2月2日");
+            } else {
+                hideError(joinDateInput, joinDateError);
+            }
+            
+            // 验证所属城镇
+            const town = townInput.value.trim();
+            if (!town) {
+                isValid = showError(townInput, townError, "请输入所属城镇");
+            } else {
+                hideError(townInput, townError);
+            }
+            
+            // 验证补发次数
+            const reissueCount = parseInt(reissueCountInput.value);
+            if (isNaN(reissueCount) || reissueCount < 1) {
+                isValid = showError(reissueCountInput, reissueCountError, "补发次数不能少于1");
+            } else {
+                hideError(reissueCountInput, reissueCountError);
+            }
+            
+            return isValid;
+        }
+        
+        // 复制按钮功能
+        copyBtn.addEventListener('click', async () => {
+            const text = commandOutput.textContent;
+            
+            if (text === "请填写下方信息生成身份证指令" || text.includes("请填写所有必填字段")) {
+                alert("请先生成身份证指令！");
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(text);
+                copyBtn.textContent = '已复制!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = '复制';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('复制失败: ', err);
+                // 备用复制方法
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                copyBtn.textContent = '已复制!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = '复制';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }
+        });
+        
+        // 身份证生成功能
+        generateIdCardBtn.addEventListener('click', () => {
+            if (!validateForm()) {
+                commandOutput.textContent = "请修正表单中的错误后再生成指令";
+                return;
+            }
+            
+            generateIdCard();
+        });
+        
+        function generateIdCard() {
+            const executor = executorInput.value.trim();
+            const author = authorInput.value.trim();
+            const playerId = playerIdInput.value.trim();
+            const joinDate = joinDateInput.value.trim();
+            const town = townInput.value.trim();
+            const reissueCount = reissueCountInput.value;
+            
+            // 更新预览
+            updateBookPreview();
+            
+            // 构建书本内容（使用双反斜杠\\n换行）
+            const bookContent = `\\\\n\\\\n      牛腩世界身份证\\\\n\\\\n玩家 ${playerId}\\\\n\\\\n你在 ${joinDate}\\\\n降落在了牛腩世界！\\\\n\\\\n\\\\n\\\\n\\\\n目前所属城镇：${town}\\\\n补发次数：${reissueCount}`;
+            
+            // 构建书本标题 - 纯文本格式："id 的牛腩世界身份证"
+            const bookTitle = `${playerId} 的牛腩世界身份证`;
+            
+            // 构建完整的指令（指令执行者和作者分开）
+            const command = `/execute run give ${executor} written_book{pages:['[["${bookContent}"]]'],title:"${bookTitle}",author:${author}}`;
+            
+            commandOutput.textContent = command;
+        }
+        
+        function updateBookPreview() {
+            const playerId = playerIdInput.value.trim() || "玩家ID";
+            const author = authorInput.value.trim() || "MSA_Sasuke";
+            const joinDate = joinDateInput.value.trim() || "入服日期";
+            const town = townInput.value.trim() || "所属城镇";
+            const reissueCount = reissueCountInput.value || "1";
+            
+            // 更新预览标题和作者
+            previewId.textContent = playerId;
+            previewAuthor.textContent = author;
+            
+            // 构建预览内容
+            const preview = `\n\n      牛腩世界身份证\n\n玩家 ${playerId}\n\n你在 ${joinDate}\n降落在了牛腩世界！\n\n\n\n\n目前所属城镇：${town}\n补发次数：${reissueCount}`;
+            
+            // 显示预览内容
+            bookPreview.textContent = preview;
+            
+            // 高亮显示特定内容
+            bookPreview.innerHTML = preview
+                .replace(/\n/g, '<br>')
+                .replace(/牛腩世界身份证/g, '<span class="center">牛腩世界身份证</span>')
+                .replace(new RegExp(playerId, 'g'), `<span class="player-id">${playerId}</span>`)
+                .replace(new RegExp(joinDate, 'g'), `<span class="date">${joinDate}</span>`)
+                .replace(new RegExp(town, 'g'), `<span class="town">${town}</span>`)
+                .replace(new RegExp(`补发次数：${reissueCount}`), `补发次数：<span class="count">${reissueCount}</span>`);
+        }
+        
+        // 输入框变化时更新预览
+        [executorInput, authorInput, playerIdInput, joinDateInput, townInput, reissueCountInput].forEach(input => {
+            input.addEventListener('input', updateBookPreview);
+        });
+        
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            // 设置默认值
+            executorInput.value = "@p";
+            authorInput.value = "MSA_Sasuke";
+            playerIdInput.value = "";
+            joinDateInput.value = getCurrentDate(); // 默认设为今日日期
+            townInput.value = "牛腩镇";
+            reissueCountInput.value = "1";
+            
+            // 初始化预览
+            updateBookPreview();
+            
+            // 自动生成一个示例指令
+            setTimeout(() => {
+                // 先设置示例值
+                playerIdInput.value = "MSA_Sasuke";
+                // 入服日期保持今日日期
+                townInput.value = "牛腩镇";
+                reissueCountInput.value = "1";
+                
+                // 更新预览
+                updateBookPreview();
+                
+                // 生成指令
+                generateIdCard();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
