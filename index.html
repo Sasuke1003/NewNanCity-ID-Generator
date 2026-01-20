@@ -27,6 +27,8 @@
             --mc-blue: #4169E1;
             --mc-dark-blue: #1E3A8A;
             --mc-red: #FF5555;
+            --mc-purple: #9933cc;
+            --mc-dark-purple: #6a1b9a;
         }
         
         body {
@@ -55,6 +57,42 @@
             font-size: 2.8rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 0 var(--mc-dark-gold);
+        }
+        
+        .version-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .version-tab {
+            background-color: var(--mc-dark);
+            color: var(--mc-light);
+            border: 2px solid var(--mc-gold);
+            border-radius: 8px 8px 0 0;
+            padding: 12px 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .version-tab.active {
+            background-color: var(--mc-gold);
+            color: #333;
+        }
+        
+        .version-tab:hover:not(.active) {
+            background-color: rgba(255, 215, 0, 0.2);
+        }
+        
+        .version-content {
+            display: none;
+        }
+        
+        .version-content.active {
+            display: block;
         }
         
         .instructions-panel {
@@ -529,6 +567,68 @@
         .flatpickr-time .flatpickr-am-pm:hover {
             background: #e0e0e0 !important;
         }
+        
+        /* 旧版样式 */
+        .book-title.old-version {
+            color: var(--mc-gold);
+        }
+        
+        .book-title.old-version .yellow {
+            color: var(--mc-gold);
+            font-weight: bold;
+        }
+        
+        .book-title.old-version .white {
+            color: white;
+        }
+        
+        .book-content.old-version {
+            position: relative;
+            background-color: #1a1a1a;
+            color: white;
+            border: 2px solid var(--mc-gold);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .book-content.old-version .lore-text {
+            color: var(--mc-purple);
+            font-style: italic;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 20px 0;
+            padding: 10px;
+            border-left: 3px solid var(--mc-purple);
+        }
+        
+        .book-content.old-version .item-type {
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 5px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 4px;
+        }
+        
+        .book-content.old-version .hbt-info {
+            color: #FFD700;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 5px;
+            background-color: rgba(255, 215, 0, 0.1);
+            border-radius: 4px;
+        }
+        
+        .old-version .date-input-container {
+            margin-top: 10px;
+        }
+        
+        .item-preview {
+            background-color: #2a2a2a;
+            border: 2px solid #555;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
@@ -537,100 +637,176 @@
             <h1><i class="fas fa-id-card mc-icon"></i> Minecraft 牛腩世界身份证生成器</h1>
         </header>
         
-        <main>
+        <div class="version-tabs">
+            <button class="version-tab active" data-version="new">新版身份证</button>
+            <button class="version-tab" data-version="old">旧版身份证</button>
+        </div>
+        
+        <!-- 新版身份证 -->
+        <div id="newVersion" class="version-content active">
             <section class="instructions-panel">
-                <h2>生成的身份证指令</h2>
+                <h2>生成的新版身份证指令</h2>
                 <div class="generated-command">
-                    <div class="command-output" id="commandOutput">请填写下方信息生成身份证指令</div>
-                    <button class="copy-btn" id="copyBtn">复制</button>
+                    <div class="command-output" id="commandOutputNew">请填写下方信息生成身份证指令</div>
+                    <button class="copy-btn" id="copyBtnNew">复制</button>
                 </div>
             </section>
             
             <div class="command-generators">
                 <!-- 身份证生成器 -->
                 <div class="generator-card">
-                    <h3 class="card-title"><i class="fas fa-id-card"></i> 身份证信息填写</h3>
+                    <h3 class="card-title"><i class="fas fa-id-card"></i> 新版身份证信息填写</h3>
                     
                     <div class="input-group executor-input">
-                        <label for="executor" class="required">指令执行者</label>
-                        <input type="text" id="executor" placeholder="执行/give指令的玩家" value="@p">
-                        <button class="example-btn" onclick="document.getElementById('executor').value = '@p'">示例: @p (当前玩家)</button>
+                        <label for="executorNew" class="required">指令执行者</label>
+                        <input type="text" id="executorNew" placeholder="执行/give指令的玩家" value="@p">
+                        <button class="example-btn" onclick="document.getElementById('executorNew').value = '@p'">示例: @p (当前玩家)</button>
                         <div class="author-note">可以是玩家ID、@p、@a、@r等选择器</div>
                     </div>
                     
                     <div class="input-group executor-input">
-                        <label for="author" class="required">书本作者</label>
-                        <input type="text" id="author" placeholder="书本作者名字" value="MSA_Sasuke">
+                        <label for="authorNew" class="required">书本作者</label>
+                        <input type="text" id="authorNew" placeholder="书本作者名字" value="MSA_Sasuke">
                         <div class="author-note">必须为英文字母、数字、下划线组成，不能为空</div>
-                        <div class="error-message" id="authorError">作者名只能包含英文字母、数字和下划线，且不能为空</div>
+                        <div class="error-message" id="authorErrorNew">作者名只能包含英文字母、数字和下划线，且不能为空</div>
                     </div>
                     
                     <div class="input-group">
-                        <label for="playerId" class="required">身份证持有者ID</label>
-                        <input type="text" id="playerId" placeholder="身份证上的玩家ID">
-                        <div class="error-message" id="playerIdError">请输入身份证持有者ID</div>
+                        <label for="playerIdNew" class="required">身份证持有者ID</label>
+                        <input type="text" id="playerIdNew" placeholder="身份证上的玩家ID">
+                        <div class="error-message" id="playerIdErrorNew">请输入身份证持有者ID</div>
                     </div>
                     
                     <div class="input-group">
-                        <label for="joinDate" class="required">入服日期</label>
+                        <label for="joinDateNew" class="required">入服日期</label>
                         <div class="date-input-container">
-                            <input type="text" id="joinDate" placeholder="格式：XXXX年XX月XX日" readonly>
-                            <button type="button" class="date-toggle-btn" id="calendarToggle">
+                            <input type="text" id="joinDateNew" placeholder="格式：XXXX年XX月XX日" readonly>
+                            <button type="button" class="date-toggle-btn" id="calendarToggleNew">
                                 <i class="fas fa-calendar-alt"></i> 选择日期
                             </button>
                         </div>
-                        <button class="example-btn" onclick="setTodayDate()">按下自动输入今日日期</button>
-                        <div class="error-message" id="joinDateError">日期格式不正确或早于2020年2月2日</div>
+                        <button class="example-btn" onclick="setTodayDate('New')">按下自动输入今日日期</button>
+                        <div class="error-message" id="joinDateErrorNew">日期格式不正确或早于2020年2月2日</div>
                     </div>
                     
                     <div class="input-group">
-                        <label for="town" class="required">所属城镇</label>
-                        <input type="text" id="town" placeholder="请输入城镇名称" value="牛腩镇">
-                        <button class="example-btn" onclick="document.getElementById('town').value = '无'">必须为已评为1星城镇或以上的城镇，否则请按此设定为无</button>
-                        <div class="error-message" id="townError">请输入所属城镇</div>
+                        <label for="townNew" class="required">所属城镇</label>
+                        <input type="text" id="townNew" placeholder="请输入城镇名称" value="牛腩镇">
+                        <button class="example-btn" onclick="document.getElementById('townNew').value = '无'">必须为已评为1星城镇或以上的城镇，否则请按此设定为无</button>
+                        <div class="error-message" id="townErrorNew">请输入所属城镇</div>
                     </div>
                     
                     <div class="input-group">
-                        <label for="reissueCount" class="required">补发次数</label>
-                        <input type="number" id="reissueCount" value="0" min="0" max="99">
-                        <button class="example-btn" onclick="document.getElementById('reissueCount').value = '0'">示例: 0</button>
-                        <div class="error-message" id="reissueCountError">补发次数不能少于0</div>
+                        <label for="reissueCountNew" class="required">补发次数</label>
+                        <input type="number" id="reissueCountNew" value="0" min="0" max="99">
+                        <button class="example-btn" onclick="document.getElementById('reissueCountNew').value = '0'">示例: 0</button>
+                        <div class="error-message" id="reissueCountErrorNew">补发次数不能少于0</div>
                     </div>
                     
-                    <button class="generate-btn" id="generateIdCard">
-                        <i class="fas fa-book"></i> 生成身份证指令
+                    <button class="generate-btn" id="generateIdCardNew">
+                        <i class="fas fa-book"></i> 生成新版身份证指令
                     </button>
                 </div>
                 
                 <!-- 预览区域 -->
                 <div class="book-preview">
-                    <h3><i class="fas fa-book-open"></i> 身份证预览</h3>
+                    <h3><i class="fas fa-book-open"></i> 新版身份证预览</h3>
                     <div class="book-title">
-                        <span class="yellow" id="previewId"></span><span class="white"> 的牛腩世界身份证</span>
-                        <div style="font-size: 0.9rem; color: #aaa; margin-top: 5px;">作者: <span id="previewAuthor">MSA_Sasuke</span></div>
+                        <span class="yellow" id="previewIdNew"></span><span class="white"> 的牛腩世界身份证</span>
+                        <div style="font-size: 0.9rem; color: #aaa; margin-top: 5px;">作者: <span id="previewAuthorNew">MSA_Sasuke</span></div>
                     </div>
-                    <div class="book-content" id="bookPreview">
+                    <div class="book-content" id="bookPreviewNew">
                         (请填写左侧信息预览身份证内容)
                     </div>
                 </div>
             </div>
-            
-            <section class="instructions">
-                <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
-                <ul>
-                    <li><strong>指令执行者</strong>：执行/give指令的玩家，默认为@p（当前玩家），可以是玩家ID或选择器</li>
-                    <li><strong>书本作者</strong>：书本的作者名字，必须为英文字母、数字、下划线组成，不能为空</li>
-                    <li><strong>身份证持有者ID</strong>：身份证上的玩家名字，必须填写</li>
-                    <li><strong>入服日期</strong>：格式为"XXXX年XX月XX日"，不能早于2020年2月2日</li>
-                    <li><strong>所属城镇</strong>：必须为已评为1星城镇或以上的城镇，否则请设定为无，默认为牛腩镇</li>
-                    <li><strong>补发次数</strong>：补发次数不能少于0，默认为0</li>
-                    <li>点击"生成身份证指令"按钮生成指令，点击"复制"按钮复制指令</li>
-                    <li>在Minecraft游戏中执行指令，即可给指定玩家生成身份证</li>
-                    <li>右侧可实时预览书本内容效果</li>
-                </ul>
-                <p><strong>注意：</strong>执行指令的玩家需要有OP权限或在开启作弊的世界中。</p>
+        </div>
+        
+        <!-- 旧版身份证 -->
+        <div id="oldVersion" class="version-content">
+            <section class="instructions-panel">
+                <h2>生成的旧版身份证指令</h2>
+                <div class="generated-command">
+                    <div class="command-output" id="commandOutputOld">请填写下方信息生成身份证指令</div>
+                    <button class="copy-btn" id="copyBtnOld">复制</button>
+                </div>
             </section>
-        </main>
+            
+            <div class="command-generators">
+                <!-- 身份证生成器 -->
+                <div class="generator-card">
+                    <h3 class="card-title"><i class="fas fa-id-card"></i> 旧版身份证信息填写</h3>
+                    
+                    <div class="input-group executor-input">
+                        <label for="executorOld" class="required">指令执行者</label>
+                        <input type="text" id="executorOld" placeholder="执行/give指令的玩家" value="@p">
+                        <button class="example-btn" onclick="document.getElementById('executorOld').value = '@p'">示例: @p (当前玩家)</button>
+                        <div class="author-note">可以是玩家ID、@p、@a、@r等选择器</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="playerIdOld" class="required">身份证持有者ID</label>
+                        <input type="text" id="playerIdOld" placeholder="身份证上的玩家ID">
+                        <div class="error-message" id="playerIdErrorOld">请输入身份证持有者ID</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="joinDateOld" class="required">入服日期</label>
+                        <div class="date-input-container">
+                            <input type="text" id="joinDateOld" placeholder="格式：XXXX年XX月XX日" readonly>
+                            <button type="button" class="date-toggle-btn" id="calendarToggleOld">
+                                <i class="fas fa-calendar-alt"></i> 选择日期
+                            </button>
+                        </div>
+                        <button class="example-btn" onclick="setTodayDate('Old')">按下自动输入今日日期</button>
+                        <div class="error-message" id="joinDateErrorOld">日期格式不正确或早于2020年2月2日</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="reissueCountOld" class="required">补发次数</label>
+                        <input type="number" id="reissueCountOld" value="0" min="0" max="99">
+                        <button class="example-btn" onclick="document.getElementById('reissueCountOld').value = '0'">示例: 0</button>
+                        <div class="error-message" id="reissueCountErrorOld">补发次数不能少于0</div>
+                    </div>
+                    
+                    <button class="generate-btn" id="generateIdCardOld">
+                        <i class="fas fa-book"></i> 生成旧版身份证指令
+                    </button>
+                </div>
+                
+                <!-- 预览区域 -->
+                <div class="book-preview">
+                    <h3><i class="fas fa-book-open"></i> 旧版身份证预览</h3>
+                    <div class="book-title old-version">
+                        <span class="yellow" id="previewIdOld"></span><span class="white"> 的牛腩世界身份证</span>
+                    </div>
+                    <div class="book-content old-version" id="bookPreviewOld">
+                        <div class="item-preview">
+                            <div class="lore-text" id="previewLoreOld">入服日期：YYYY年MM月DD日</div>
+                            <div class="item-type">minecraft:paper</div>
+                            <div class="hbt-info">HBT: 1 tag(s)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <section class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 使用说明</h3>
+            <ul>
+                <li><strong>新版身份证</strong>：书本格式，包含完整的身份证信息，需要填写作者、城镇等信息</li>
+                <li><strong>旧版身份证</strong>：物品格式，只有玩家ID、入服日期和补发次数信息</li>
+                <li><strong>指令执行者</strong>：执行/give指令的玩家，默认为@p（当前玩家），可以是玩家ID或选择器</li>
+                <li><strong>身份证持有者ID</strong>：身份证上的玩家名字，必须填写</li>
+                <li><strong>入服日期</strong>：格式为"XXXX年XX月XX日"，不能早于2020年2月2日</li>
+                <li><strong>所属城镇</strong>：仅新版需要，必须为已评为1星城镇或以上的城镇，否则请设定为无，默认为牛腩镇</li>
+                <li><strong>补发次数</strong>：补发次数不能少于0，默认为0</li>
+                <li>点击"生成身份证指令"按钮生成指令，点击"复制"按钮复制指令</li>
+                <li>在Minecraft游戏中执行指令，即可给指定玩家生成身份证</li>
+                <li>右侧可实时预览身份证效果</li>
+            </ul>
+            <p><strong>注意：</strong>执行指令的玩家需要有OP权限或在开启作弊的世界中。</p>
+        </section>
         
         <footer>
             <p>Minecraft | NewNanCity 牛腩小镇 | 牛腩世界身份证生成器</p>
@@ -640,34 +816,34 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
     <script>
-        // 获取DOM元素
-        const commandOutput = document.getElementById('commandOutput');
-        const copyBtn = document.getElementById('copyBtn');
-        const bookPreview = document.getElementById('bookPreview');
-        const previewId = document.getElementById('previewId');
-        const previewAuthor = document.getElementById('previewAuthor');
+        // 版本切换功能
+        document.querySelectorAll('.version-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有标签的active类
+                document.querySelectorAll('.version-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // 隐藏所有版本内容
+                document.querySelectorAll('.version-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // 激活当前标签
+                this.classList.add('active');
+                
+                // 显示对应的版本内容
+                const version = this.getAttribute('data-version');
+                document.getElementById(`${version}Version`).classList.add('active');
+                
+                // 更新当前活动的版本
+                currentVersion = version;
+            });
+        });
         
-        // 输入元素
-        const executorInput = document.getElementById('executor');
-        const authorInput = document.getElementById('author');
-        const playerIdInput = document.getElementById('playerId');
-        const joinDateInput = document.getElementById('joinDate');
-        const townInput = document.getElementById('town');
-        const reissueCountInput = document.getElementById('reissueCount');
-        const calendarToggle = document.getElementById('calendarToggle');
-        
-        // 错误信息元素
-        const authorError = document.getElementById('authorError');
-        const playerIdError = document.getElementById('playerIdError');
-        const joinDateError = document.getElementById('joinDateError');
-        const townError = document.getElementById('townError');
-        const reissueCountError = document.getElementById('reissueCountError');
-        
-        // 生成按钮
-        const generateIdCardBtn = document.getElementById('generateIdCard');
-        
-        // 日历实例
-        let calendar;
+        // 当前活动版本
+        let currentVersion = 'new';
+        let calendarNew, calendarOld;
         
         // 获取当前日期并格式化为中文格式
         function getCurrentDate() {
@@ -679,13 +855,17 @@
         }
         
         // 设置今日日期到输入框
-        function setTodayDate() {
+        function setTodayDate(version) {
+            const joinDateInput = document.getElementById(`joinDate${version}`);
             joinDateInput.value = getCurrentDate();
-            updateBookPreview();
-            hideError(joinDateInput, joinDateError);
+            updateBookPreview(version);
+            const errorElement = document.getElementById(`joinDateError${version}`);
+            if (errorElement) {
+                hideError(joinDateInput, errorElement);
+            }
         }
         
-        // 验证作者名字格式（英文字母、数字、下划线）
+        // 验证作者名字格式（英文字母、数字、下划线）- 仅新版需要
         function validateAuthor(authorStr) {
             if (!authorStr || authorStr.trim() === '') return false;
             // 只允许英文字母、数字和下划线
@@ -731,125 +911,171 @@
             return true;
         }
         
-        // 验证表单
-        function validateForm() {
+        // 验证表单 - 新版
+        function validateFormNew() {
             let isValid = true;
             
             // 验证指令执行者
-            const executor = executorInput.value.trim();
+            const executor = document.getElementById('executorNew').value.trim();
             if (!executor) {
-                isValid = showError(executorInput, playerIdError, "请输入指令执行者");
+                isValid = showError(document.getElementById('executorNew'), document.getElementById('playerIdErrorNew'), "请输入指令执行者");
             } else {
-                hideError(executorInput, playerIdError);
+                hideError(document.getElementById('executorNew'), document.getElementById('playerIdErrorNew'));
             }
             
             // 验证作者名字
-            const author = authorInput.value.trim();
+            const author = document.getElementById('authorNew').value.trim();
             if (!author) {
-                isValid = showError(authorInput, authorError, "请输入书本作者");
+                isValid = showError(document.getElementById('authorNew'), document.getElementById('authorErrorNew'), "请输入书本作者");
             } else if (!validateAuthor(author)) {
-                isValid = showError(authorInput, authorError, "作者名只能包含英文字母、数字和下划线");
+                isValid = showError(document.getElementById('authorNew'), document.getElementById('authorErrorNew'), "作者名只能包含英文字母、数字和下划线");
             } else {
-                hideError(authorInput, authorError);
+                hideError(document.getElementById('authorNew'), document.getElementById('authorErrorNew'));
             }
             
             // 验证身份证持有者ID
-            const playerId = playerIdInput.value.trim();
+            const playerId = document.getElementById('playerIdNew').value.trim();
             if (!playerId) {
-                isValid = showError(playerIdInput, playerIdError, "请输入身份证持有者ID");
+                isValid = showError(document.getElementById('playerIdNew'), document.getElementById('playerIdErrorNew'), "请输入身份证持有者ID");
             } else {
-                hideError(playerIdInput, playerIdError);
+                hideError(document.getElementById('playerIdNew'), document.getElementById('playerIdErrorNew'));
             }
             
             // 验证入服日期
-            const joinDate = joinDateInput.value.trim();
+            const joinDate = document.getElementById('joinDateNew').value.trim();
             if (!joinDate) {
-                isValid = showError(joinDateInput, joinDateError, "请输入入服日期");
+                isValid = showError(document.getElementById('joinDateNew'), document.getElementById('joinDateErrorNew'), "请输入入服日期");
             } else if (!validateDate(joinDate)) {
-                isValid = showError(joinDateInput, joinDateError, "日期格式不正确或早于2020年2月2日");
+                isValid = showError(document.getElementById('joinDateNew'), document.getElementById('joinDateErrorNew'), "日期格式不正确或早于2020年2月2日");
             } else {
-                hideError(joinDateInput, joinDateError);
+                hideError(document.getElementById('joinDateNew'), document.getElementById('joinDateErrorNew'));
             }
             
             // 验证所属城镇
-            const town = townInput.value.trim();
+            const town = document.getElementById('townNew').value.trim();
             if (!town) {
-                isValid = showError(townInput, townError, "请输入所属城镇");
+                isValid = showError(document.getElementById('townNew'), document.getElementById('townErrorNew'), "请输入所属城镇");
             } else {
-                hideError(townInput, townError);
+                hideError(document.getElementById('townNew'), document.getElementById('townErrorNew'));
             }
             
             // 验证补发次数
-            const reissueCount = parseInt(reissueCountInput.value);
+            const reissueCount = parseInt(document.getElementById('reissueCountNew').value);
             if (isNaN(reissueCount) || reissueCount < 0) {
-                isValid = showError(reissueCountInput, reissueCountError, "补发次数不能少于0");
+                isValid = showError(document.getElementById('reissueCountNew'), document.getElementById('reissueCountErrorNew'), "补发次数不能少于0");
             } else {
-                hideError(reissueCountInput, reissueCountError);
+                hideError(document.getElementById('reissueCountNew'), document.getElementById('reissueCountErrorNew'));
+            }
+            
+            return isValid;
+        }
+        
+        // 验证表单 - 旧版
+        function validateFormOld() {
+            let isValid = true;
+            
+            // 验证指令执行者
+            const executor = document.getElementById('executorOld').value.trim();
+            if (!executor) {
+                isValid = showError(document.getElementById('executorOld'), document.getElementById('playerIdErrorOld'), "请输入指令执行者");
+            } else {
+                hideError(document.getElementById('executorOld'), document.getElementById('playerIdErrorOld'));
+            }
+            
+            // 验证身份证持有者ID
+            const playerId = document.getElementById('playerIdOld').value.trim();
+            if (!playerId) {
+                isValid = showError(document.getElementById('playerIdOld'), document.getElementById('playerIdErrorOld'), "请输入身份证持有者ID");
+            } else {
+                hideError(document.getElementById('playerIdOld'), document.getElementById('playerIdErrorOld'));
+            }
+            
+            // 验证入服日期
+            const joinDate = document.getElementById('joinDateOld').value.trim();
+            if (!joinDate) {
+                isValid = showError(document.getElementById('joinDateOld'), document.getElementById('joinDateErrorOld'), "请输入入服日期");
+            } else if (!validateDate(joinDate)) {
+                isValid = showError(document.getElementById('joinDateOld'), document.getElementById('joinDateErrorOld'), "日期格式不正确或早于2020年2月2日");
+            } else {
+                hideError(document.getElementById('joinDateOld'), document.getElementById('joinDateErrorOld'));
+            }
+            
+            // 验证补发次数
+            const reissueCount = parseInt(document.getElementById('reissueCountOld').value);
+            if (isNaN(reissueCount) || reissueCount < 0) {
+                isValid = showError(document.getElementById('reissueCountOld'), document.getElementById('reissueCountErrorOld'), "补发次数不能少于0");
+            } else {
+                hideError(document.getElementById('reissueCountOld'), document.getElementById('reissueCountErrorOld'));
             }
             
             return isValid;
         }
         
         // 复制按钮功能
-        copyBtn.addEventListener('click', async () => {
-            const text = commandOutput.textContent;
+        function setupCopyButton(version) {
+            const copyBtn = document.getElementById(`copyBtn${version}`);
+            const commandOutput = document.getElementById(`commandOutput${version}`);
             
-            if (text === "请填写下方信息生成身份证指令" || text.includes("请填写所有必填字段")) {
-                alert("请先生成身份证指令！");
+            copyBtn.addEventListener('click', async () => {
+                const text = commandOutput.textContent;
+                
+                if (text === "请填写下方信息生成身份证指令" || text.includes("请填写所有必填字段")) {
+                    alert("请先生成身份证指令！");
+                    return;
+                }
+                
+                try {
+                    await navigator.clipboard.writeText(text);
+                    copyBtn.textContent = '已复制!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = '复制';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('复制失败: ', err);
+                    // 备用复制方法
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    copyBtn.textContent = '已复制!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = '复制';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }
+            });
+        }
+        
+        // 新版身份证生成功能
+        document.getElementById('generateIdCardNew').addEventListener('click', () => {
+            if (!validateFormNew()) {
+                document.getElementById('commandOutputNew').textContent = "请修正表单中的错误后再生成指令";
                 return;
             }
             
-            try {
-                await navigator.clipboard.writeText(text);
-                copyBtn.textContent = '已复制!';
-                copyBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyBtn.textContent = '复制';
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            } catch (err) {
-                console.error('复制失败: ', err);
-                // 备用复制方法
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                copyBtn.textContent = '已复制!';
-                copyBtn.classList.add('copied');
-                
-                setTimeout(() => {
-                    copyBtn.textContent = '复制';
-                    copyBtn.classList.remove('copied');
-                }, 2000);
-            }
+            generateIdCardNew();
         });
         
-        // 身份证生成功能
-        generateIdCardBtn.addEventListener('click', () => {
-            if (!validateForm()) {
-                commandOutput.textContent = "请修正表单中的错误后再生成指令";
-                return;
-            }
-            
-            generateIdCard();
-        });
-        
-        function generateIdCard() {
-            const executor = executorInput.value.trim();
-            const author = authorInput.value.trim();
-            const playerId = playerIdInput.value.trim();
-            const joinDate = joinDateInput.value.trim();
-            const town = townInput.value.trim();
-            const reissueCount = reissueCountInput.value;
+        function generateIdCardNew() {
+            const executor = document.getElementById('executorNew').value.trim();
+            const author = document.getElementById('authorNew').value.trim();
+            const playerId = document.getElementById('playerIdNew').value.trim();
+            const joinDate = document.getElementById('joinDateNew').value.trim();
+            const town = document.getElementById('townNew').value.trim();
+            const reissueCount = document.getElementById('reissueCountNew').value;
             
             // 更新预览
-            updateBookPreview();
+            updateBookPreview('New');
             
-            // 构建书本内容（移除了作者信息）
+            // 构建书本内容
             const bookContent = `\\\\n\\\\n      牛腩世界身份证\\\\n\\\\n玩家 ${playerId}\\\\n\\\\n你在 ${joinDate}\\\\n降落在了牛腩世界！\\\\n\\\\n\\\\n\\\\n\\\\n目前所属城镇：${town}\\\\n补发次数：${reissueCount}`;
             
             // 构建书本标题
@@ -858,21 +1084,52 @@
             // 构建完整的指令
             const command = `/execute run give ${executor} written_book{pages:['[["${bookContent}"]]'],title:"${bookTitle}",author:${author}}`;
             
-            commandOutput.textContent = command;
+            document.getElementById('commandOutputNew').textContent = command;
         }
         
-        function updateBookPreview() {
-            const playerId = playerIdInput.value.trim();
-            const author = authorInput.value.trim();
-            const joinDate = joinDateInput.value.trim() || "入服日期";
-            const town = townInput.value.trim() || "所属城镇";
-            const reissueCount = reissueCountInput.value || "0";
+        // 旧版身份证生成功能 - 修正版
+        document.getElementById('generateIdCardOld').addEventListener('click', () => {
+            if (!validateFormOld()) {
+                document.getElementById('commandOutputOld').textContent = "请修正表单中的错误后再生成指令";
+                return;
+            }
+            
+            generateIdCardOld();
+        });
+        
+        function generateIdCardOld() {
+            const executor = document.getElementById('executorOld').value.trim();
+            const playerId = document.getElementById('playerIdOld').value.trim();
+            const joinDate = document.getElementById('joinDateOld').value.trim();
+            
+            // 更新预览
+            updateBookPreview('Old');
+            
+            // 构建物品名称（JSON格式，黄色+白色）
+            const itemName = `'[{"text":"${playerId}","color":"yellow","bold":false},{"text":" 的牛腩世界身份证","color":"white","bold":false}]'`;
+            
+            // 构建lore（JSON格式，紫色斜体）
+            const lore = `'[{"text":"入服日期：${joinDate}","color":"dark_purple","italic":true}]'`;
+            
+            // 构建完整的指令 - 修正格式
+            const command = `/execute run give ${executor} minecraft:paper{display:{Name:${itemName},Lore:[${lore}]},HBT:1b}`;
+            
+            document.getElementById('commandOutputOld').textContent = command;
+        }
+        
+        // 更新预览 - 新版
+        function updateBookPreviewNew() {
+            const playerId = document.getElementById('playerIdNew').value.trim();
+            const author = document.getElementById('authorNew').value.trim();
+            const joinDate = document.getElementById('joinDateNew').value.trim() || "入服日期";
+            const town = document.getElementById('townNew').value.trim() || "所属城镇";
+            const reissueCount = document.getElementById('reissueCountNew').value || "0";
             
             // 更新预览标题和作者
-            previewId.textContent = playerId || "";
-            previewAuthor.textContent = author || "佚名";
+            document.getElementById('previewIdNew').textContent = playerId || "";
+            document.getElementById('previewAuthorNew').textContent = author || "佚名";
             
-            // 构建预览内容（移除了作者信息）
+            // 构建预览内容
             const previewLines = [
                 "\n\n      牛腩世界身份证\n\n",
                 playerId ? `玩家 ${playerId}\n\n` : "玩家 \n\n",
@@ -882,6 +1139,7 @@
             ].join('');
             
             // 显示预览内容
+            const bookPreview = document.getElementById('bookPreviewNew');
             bookPreview.textContent = previewLines;
             
             // 高亮显示特定内容
@@ -893,23 +1151,19 @@
             }
             
             if (playerId && htmlContent.includes(`玩家 ${playerId}`)) {
-                // 只高亮完整的玩家ID
                 const playerIdRegex = new RegExp(`玩家 ${playerId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'g');
                 htmlContent = htmlContent.replace(playerIdRegex, `玩家 <span class="player-id">${playerId}</span>`);
             } else if (htmlContent.includes('玩家 ')) {
-                // 如果没有玩家ID，保持空白
                 htmlContent = htmlContent.replace('玩家 ', '玩家 ');
             }
             
             if (joinDate && htmlContent.includes(`你在 ${joinDate}`)) {
-                // 安全转义正则特殊字符
                 const escapedJoinDate = joinDate.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const joinDateRegex = new RegExp(`你在 ${escapedJoinDate}`, 'g');
                 htmlContent = htmlContent.replace(joinDateRegex, `你在 <span class="date">${joinDate}</span>`);
             }
             
             if (town && htmlContent.includes(`目前所属城镇：${town}`)) {
-                // 安全转义正则特殊字符
                 const escapedTown = town.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 htmlContent = htmlContent.replace(`目前所属城镇：${town}`, `目前所属城镇：<span class="town">${town}</span>`);
             }
@@ -921,9 +1175,34 @@
             bookPreview.innerHTML = htmlContent;
         }
         
+        // 更新预览 - 旧版
+        function updateBookPreviewOld() {
+            const playerId = document.getElementById('playerIdOld').value.trim();
+            const joinDate = document.getElementById('joinDateOld').value.trim() || "YYYY年MM月DD日";
+            
+            // 更新预览标题
+            document.getElementById('previewIdOld').textContent = playerId || "";
+            
+            // 更新lore预览
+            const loreText = `入服日期：${joinDate}`;
+            document.getElementById('previewLoreOld').textContent = loreText;
+        }
+        
+        // 统一的更新预览函数
+        function updateBookPreview(version) {
+            if (version === 'New') {
+                updateBookPreviewNew();
+            } else {
+                updateBookPreviewOld();
+            }
+        }
+        
         // 初始化日历选择器
-        function initCalendar() {
-            calendar = flatpickr(joinDateInput, {
+        function initCalendar(version) {
+            const joinDateInput = document.getElementById(`joinDate${version}`);
+            const calendarToggle = document.getElementById(`calendarToggle${version}`);
+            
+            const calendar = flatpickr(joinDateInput, {
                 locale: "zh",
                 dateFormat: "Y年m月d日",
                 minDate: "2020-02-02",
@@ -931,8 +1210,11 @@
                 onChange: function(selectedDates, dateStr, instance) {
                     if (dateStr) {
                         joinDateInput.value = dateStr;
-                        updateBookPreview();
-                        hideError(joinDateInput, joinDateError);
+                        updateBookPreview(version);
+                        const errorElement = document.getElementById(`joinDateError${version}`);
+                        if (errorElement) {
+                            hideError(joinDateInput, errorElement);
+                        }
                     }
                 }
             });
@@ -941,31 +1223,53 @@
             calendarToggle.addEventListener('click', function() {
                 calendar.open();
             });
+            
+            return calendar;
         }
-        
-        // 输入框变化时更新预览
-        [executorInput, authorInput, playerIdInput, townInput, reissueCountInput].forEach(input => {
-            input.addEventListener('input', updateBookPreview);
-        });
-        
-        // 日期输入框变化时更新预览
-        joinDateInput.addEventListener('input', updateBookPreview);
         
         // 页面加载时初始化
         window.addEventListener('DOMContentLoaded', () => {
-            // 设置默认值
-            executorInput.value = "@p";
-            authorInput.value = "MSA_Sasuke";
-            playerIdInput.value = "";  // 身份证持有者ID默认空白
-            joinDateInput.value = getCurrentDate(); // 默认设为今日日期
-            townInput.value = "牛腩镇";
-            reissueCountInput.value = "0";
+            // 设置默认值 - 新版
+            document.getElementById('executorNew').value = "@p";
+            document.getElementById('authorNew').value = "MSA_Sasuke";
+            document.getElementById('playerIdNew').value = "";
+            document.getElementById('joinDateNew').value = getCurrentDate();
+            document.getElementById('townNew').value = "牛腩镇";
+            document.getElementById('reissueCountNew').value = "0";
+            
+            // 设置默认值 - 旧版
+            document.getElementById('executorOld').value = "@p";
+            document.getElementById('playerIdOld').value = "";
+            document.getElementById('joinDateOld').value = getCurrentDate();
+            document.getElementById('reissueCountOld').value = "0";
             
             // 初始化日历
-            initCalendar();
+            calendarNew = initCalendar('New');
+            calendarOld = initCalendar('Old');
             
             // 初始化预览
-            updateBookPreview();
+            updateBookPreviewNew();
+            updateBookPreviewOld();
+            
+            // 设置复制按钮
+            setupCopyButton('New');
+            setupCopyButton('Old');
+            
+            // 输入框变化时更新预览
+            ['New', 'Old'].forEach(version => {
+                const inputs = version === 'New' ? 
+                    ['executorNew', 'authorNew', 'playerIdNew', 'townNew', 'reissueCountNew'] :
+                    ['executorOld', 'playerIdOld', 'reissueCountOld'];
+                
+                inputs.forEach(inputId => {
+                    const input = document.getElementById(inputId);
+                    input.addEventListener('input', () => updateBookPreview(version));
+                });
+                
+                // 日期输入框变化时更新预览
+                const joinDateInput = document.getElementById(`joinDate${version}`);
+                joinDateInput.addEventListener('input', () => updateBookPreview(version));
+            });
         });
     </script>
 </body>
